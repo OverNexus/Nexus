@@ -1,0 +1,3 @@
+NewsAPI : bb47c7769d264e79b455ddc239c5f4e4
+
+GeminiAPI : AIzaSyCqO1nRj9jcrIMmBKSpVkgJ83mgLzpS1RU

@@ -1,0 +1,14 @@
+baseURL = "https://yourdomain.github.io/"
+languageCode = "en-us"
+title = "TechPulse"
+theme = "techpulse"
+paginate = 9
+
+[params]
+  description = "The latest in Gaming, AR, VR & Technology"
+  tagline = "Next-Gen Tech. Zero Delay."
+  author = "TechPulse Editorial"
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"

@@ -1,0 +1,17 @@
+<header class="site-header" role="banner">
+  <nav class="nav-container" aria-label="Main navigation">
+    <a href="{{ "/" | relURL }}" class="logo" aria-label="{{ .Site.Title }} home">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">TECH<span class="logo-accent">PULSE</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu" id="nav-menu" role="list">
+      <li><a href="{{ "/" | relURL }}" class="{{ if .IsHome }}active{{ end }}">Home</a></li>
+      <li><a href="{{ "/categories/gaming" | relURL }}">Gaming</a></li>
+      <li><a href="{{ "/categories/ar-vr" | relURL }}">AR / VR</a></li>
+      <li><a href="{{ "/categories/tech" | relURL }}">Tech</a></li>
+    </ul>
+  </nav>
+</header>

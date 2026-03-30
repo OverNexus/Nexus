@@ -1,0 +1,35 @@
+{{ define "main" }}
+<section class="hero" aria-label="Hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">AI-Powered Tech Journalism</div>
+    <h1 class="hero-title">
+      <span class="hero-title-line">Next-Gen</span>
+      <span class="hero-title-line accent">Tech News</span>
+      <span class="hero-title-line">Zero Delay.</span>
+    </h1>
+    <p class="hero-sub">Gaming · Augmented Reality · Virtual Reality · Technology</p>
+    <a href="#latest" class="btn-primary">Explore Latest</a>
+  </div>
+  <div class="hero-grid-overlay" aria-hidden="true"></div>
+</section>
+
+<section class="category-bar" aria-label="Browse by category">
+  <div class="container">
+    <a href="{{ "/categories/gaming" | relURL }}" class="cat-pill cat-gaming">🎮 Gaming</a>
+    <a href="{{ "/categories/ar-vr" | relURL }}" class="cat-pill cat-arvr">🥽 AR / VR</a>
+    <a href="{{ "/categories/tech" | relURL }}" class="cat-pill cat-tech">💻 Tech</a>
+  </div>
+</section>
+
+<section class="latest-articles container" id="latest" aria-label="Latest articles">
+  <h2 class="section-title">Latest <span class="accent">Articles</span></h2>
+  {{ $paginator := .Paginate (where .Site.RegularPages "Type" "posts") }}
+  <div class="article-grid">
+    {{ range $paginator.Pages }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+  {{ template "_internal/pagination.html" . }}
+</section>
+{{ end }}
