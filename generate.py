@@ -8,7 +8,8 @@ import os
 import re
 import datetime
 import requests
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # ── Config ────────────────────────────────────────────────────────────────────
 NEWS_API_KEY  = os.getenv("NEWS_API_KEY",  "bb47c7769d264e79b455ddc239c5f4e4")
@@ -41,8 +42,7 @@ def fetch_top_story():
 
 # ── Gemini: generate full article ─────────────────────────────────────────────
 def generate_article(story: dict) -> str:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     prompt = f"""
 You are a senior tech journalist writing for TechPulse, a high-end professional website
@@ -98,7 +98,10 @@ tags: ["tag1", "tag2", "tag3", "tag4"]
 [Final 1-2 paragraph conclusion with forward-looking insight]
 """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt
+    )
     return response.text.strip()
 
 # ── Save as Hugo Markdown file ─────────────────────────────────────────────────
