@@ -7,10 +7,19 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   generate-and-publish:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -30,6 +39,14 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate.py
 
+      - name: Commit new article
+        run: |
+          git config user.name "TechPulse Bot"
+          git config user.email "bot@techpulse.ai"
+          git add site/content/posts/
+          git diff --staged --quiet || git commit -m "feat: auto-publish article $(date +%Y-%m-%d)"
+          git push
+
       - name: Set up Hugo
         uses: peaceiris/actions-hugo@v3
         with:
@@ -39,8 +56,11 @@ jobs:
       - name: Build Hugo site
         run: hugo --source site --destination public --minify
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site/public
+          path: site/public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
