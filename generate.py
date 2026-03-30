@@ -16,7 +16,7 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY", "bb47c7769d264e79b455ddc239c5f4e4")
 OUTPUT_DIR   = os.path.join("site", "content", "posts")
 
 # Pool of Gemini keys — add more as needed, script rotates on quota exhaustion
-GEMINI_KEYS = [k.strip() for k in os.getenv("GEMINI_API_KEYS", "AIzaSyC8PmFK04Lqm7_WMmBgshoqooggzt5lcJc").split(",") if k.strip()]
+GEMINI_KEYS = [k.strip() for k in os.getenv("GEMINI_API_KEYS", "AIzaSyAxdhwFp7kgpPt7TIL09DWB0xPKP5EZiwM,AIzaSyBRV4iTJ5K_kaJlhDxGB94AjzKCaLt50WQ,AIzaSyBXpQQL_5Mrbk6afwcH4_czydnAo725Aps,AIzaSyBuo4ODSWhidUvNdAqmFjAzZuviCnL7JRs").split(",") if k.strip()]
 
 CATEGORIES = ["gaming", "virtual reality", "augmented reality", "tech hardware", "AI gaming"]
 
