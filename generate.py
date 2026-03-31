@@ -11,7 +11,8 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "bb47c7769d264e79b455ddc239c5f4e4")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY    = os.getenv("GROQ_API_KEY", "")
+PEXELS_API_KEY  = os.getenv("PEXELS_API_KEY", "")
 OUTPUT_DIR   = os.path.join("site", "_posts")
 USED_FILE    = os.path.join("site", "_data", "used_stories.txt")
 
@@ -29,13 +30,30 @@ def mark_used(title: str):
     with open(USED_FILE, "a", encoding="utf-8") as f:
         f.write(title.strip().lower() + "\n")
 
-# ── Fetch a relevant image from Unsplash (free, no key needed) ───────────────
+# ── Fetch image from Pexels ───────────────────────────────────────────────────
 def fetch_image(query: str) -> str:
+    fallbacks = [
+        "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200",  # gaming setup
+        "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?w=1200",  # tech
+        "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?w=1200",    # vr
+    ]
+    if not PEXELS_API_KEY:
+        return fallbacks[0]
     try:
-        safe_query = re.sub(r'[^a-z0-9 ]', '', query.lower()).strip().replace(' ', ',')[:50]
-        return f"https://source.unsplash.com/1200x630/?{safe_query}"
-    except Exception:
-        return "https://source.unsplash.com/1200x630/?gaming,technology"
+        clean = re.sub(r'[^a-z0-9 ]', '', query.lower()).strip()[:60]
+        resp = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers={"Authorization": PEXELS_API_KEY},
+            params={"query": clean, "per_page": 1, "orientation": "landscape"},
+            timeout=10
+        )
+        resp.raise_for_status()
+        photos = resp.json().get("photos", [])
+        if photos:
+            return photos[0]["src"]["large2x"]
+    except Exception as e:
+        print(f"[Pexels] Image fetch failed: {e}")
+    return fallbacks[0]
 
 # ── NewsAPI: fetch top story ───────────────────────────────────────────────────
 def fetch_top_story():
