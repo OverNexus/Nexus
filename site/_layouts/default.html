@@ -67,6 +67,15 @@
   </script>
   {% endif %}
 
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQZN6C7E5K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZQZN6C7E5K');
+  </script>
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}" />
   <link rel="alternate icon" href="{{ '/favicon.svg' | relative_url }}" />
