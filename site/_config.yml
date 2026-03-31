@@ -1,8 +1,9 @@
 title: Nexus News
-description: "Daily Gaming, AR, VR & Tech News — Powered by AI"
+description: "Daily Gaming, AR, VR & Tech News — AI-powered journalism covering the stories that matter"
 baseurl: "/Nexus"
 url: "https://OverNexus.github.io"
 author: Nexus News Editorial
+lang: en
 
 permalink: /posts/:slug/
 
@@ -17,9 +18,23 @@ paginate_path: "/page/:num/"
 markdown: kramdown
 highlighter: rouge
 
+# SEO
+twitter:
+  username: nexusnews
+logo: /assets/img/logo.png
+social:
+  name: Nexus News
+  links: []
+
+# Feed
+feed:
+  title: Nexus News
+  description: "Daily Gaming, AR, VR & Tech News"
+
 defaults:
   - scope:
       path: ""
       type: "posts"
     values:
       layout: "post"
+      author: "Nexus News Editorial"
