@@ -1,3 +1,4 @@
 NewsAPI : bb47c7769d264e79b455ddc239c5f4e4
 
-GeminiAPI : AIzaSyCqO1nRj9jcrIMmBKSpVkgJ83mgLzpS1RU
+
+grok API : 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

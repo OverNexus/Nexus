@@ -1,0 +1,25 @@
+title: TechPulse
+description: "Daily Gaming, AR, VR & Tech News — Powered by AI"
+baseurl: "/Nexus"
+url: "https://tigerbleu2015.github.io"
+author: TechPulse Editorial
+
+permalink: /posts/:slug/
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-paginate
+
+paginate: 9
+paginate_path: "/page/:num/"
+
+markdown: kramdown
+highlighter: rouge
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"

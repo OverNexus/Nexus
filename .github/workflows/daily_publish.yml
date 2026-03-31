@@ -22,7 +22,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -30,36 +30,38 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install requests google-genai
+      - name: Install Python deps
+        run: pip install requests
 
-      - name: Run article generator
+      - name: Generate article
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-          GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python generate.py
 
       - name: Commit new article
         run: |
           git config user.name "TechPulse Bot"
           git config user.email "bot@techpulse.ai"
-          git add site/content/posts/
-          git diff --staged --quiet || git commit -m "feat: auto-publish article $(date +%Y-%m-%d)"
+          git add site/_posts/
+          git diff --staged --quiet || git commit -m "feat: article $(date +%Y-%m-%d)"
           git push
 
-      - name: Set up Hugo
-        uses: peaceiris/actions-hugo@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          hugo-version: 'latest'
-          extended: true
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: site
 
-      - name: Build Hugo site
-        run: hugo --source site --destination public --minify
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+        working-directory: site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site/public
+          path: site/_site
 
       - name: Deploy to GitHub Pages
         id: deployment
