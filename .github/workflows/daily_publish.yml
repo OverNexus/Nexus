@@ -41,9 +41,9 @@ jobs:
 
       - name: Commit new article
         run: |
-          git config user.name "TechPulse Bot"
-          git config user.email "bot@techpulse.ai"
-          git add site/_posts/
+          git config user.name "Nexus News Bot"
+          git config user.email "bot@nexusnews.ai"
+          git add site/_posts/ site/_data/
           git diff --staged --quiet || git commit -m "feat: article $(date +%Y-%m-%d)"
           git push
 

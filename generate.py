@@ -13,8 +13,21 @@ import requests
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "bb47c7769d264e79b455ddc239c5f4e4")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 OUTPUT_DIR   = os.path.join("site", "_posts")
+USED_FILE    = os.path.join("site", "_data", "used_stories.txt")
 
 CATEGORIES = ["gaming", "virtual reality", "augmented reality", "tech hardware", "AI gaming"]
+
+# ── Load / save used story titles ─────────────────────────────────────────────
+def load_used() -> set:
+    if not os.path.exists(USED_FILE):
+        return set()
+    with open(USED_FILE, encoding="utf-8") as f:
+        return {line.strip().lower() for line in f if line.strip()}
+
+def mark_used(title: str):
+    os.makedirs(os.path.dirname(USED_FILE), exist_ok=True)
+    with open(USED_FILE, "a", encoding="utf-8") as f:
+        f.write(title.strip().lower() + "\n")
 
 # ── Fetch a relevant image from Unsplash (free, no key needed) ───────────────
 def fetch_image(query: str) -> str:
@@ -26,6 +39,7 @@ def fetch_image(query: str) -> str:
 
 # ── NewsAPI: fetch top story ───────────────────────────────────────────────────
 def fetch_top_story():
+    used = load_used()
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
     for category in CATEGORIES:
         params = {
@@ -33,16 +47,18 @@ def fetch_top_story():
             "from": yesterday,
             "sortBy": "popularity",
             "language": "en",
-            "pageSize": 5,
+            "pageSize": 10,
             "apiKey": NEWS_API_KEY,
         }
         resp = requests.get("https://newsapi.org/v2/everything", params=params, timeout=10)
         resp.raise_for_status()
         for a in resp.json().get("articles", []):
-            if a.get("title") and a.get("description") and "[Removed]" not in a["title"]:
-                print(f"[NewsAPI] Found: {a['title']}")
+            title = a.get("title", "")
+            if (a.get("description") and "[Removed]" not in title
+                    and title.lower() not in used):
+                print(f"[NewsAPI] Found new story: {title}")
                 return a
-    raise RuntimeError("No suitable news story found today.")
+    raise RuntimeError("No new stories found today — all recent stories already published.")
 
 # ── Groq: generate full article ───────────────────────────────────────────────
 def generate_article(story: dict) -> str:
@@ -92,7 +108,7 @@ def generate_article(story: dict) -> str:
     return text
 
 # ── Save as Jekyll _posts file ────────────────────────────────────────────────
-def save_article(content: str):
+def save_article(content: str, story: dict):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     title_match = re.search(r'^title:\s*["\'](.+?)["\']', content, re.MULTILINE)
     if title_match:
@@ -103,6 +119,7 @@ def save_article(content: str):
     filepath = os.path.join(OUTPUT_DIR, filename)
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
+    mark_used(story["title"])
     print(f"[TechPulse] Saved: {filepath}")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -110,5 +127,5 @@ if __name__ == "__main__":
     print("[TechPulse] Starting daily generation...")
     story   = fetch_top_story()
     article = generate_article(story)
-    save_article(article)
+    save_article(article, story)
     print("[TechPulse] Done.")
