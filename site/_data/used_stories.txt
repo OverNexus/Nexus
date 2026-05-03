@@ -71,3 +71,5 @@ https://www.androidcentral.com/phones/google-pixel/googles-tensor-g6-rumors-near
 google's tensor g6 rumors nearly had me hyped, but it might let me down
 https://www.theverge.com/games/921823/valve-steam-controller-mechanism-mounts-basegrip-dock
 this accessory can snap a steam controller to your phone — or almost anything else
+https://hackaday.com/2026/05/01/rust-helps-make-a-1-handheld-console/
+rust helps make a $1 handheld console
