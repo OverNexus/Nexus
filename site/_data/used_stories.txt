@@ -75,3 +75,5 @@ https://hackaday.com/2026/05/01/rust-helps-make-a-1-handheld-console/
 rust helps make a $1 handheld console
 https://www.businessinsider.com/ukraine-drone-pilots-train-in-grand-theft-auto-v-2026-5
 ukraine says it's training drone pilots in 'grand theft auto v'
+https://www.xda-developers.com/the-open-source-windows-clone-reactos-just-got-a-lot-easier-to-install/
+this open-source windows clone just got a lot easier to install
