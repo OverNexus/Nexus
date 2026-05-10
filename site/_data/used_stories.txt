@@ -85,3 +85,5 @@ https://www.androidcentral.com/phones/qualcomm/qualcomm-unveils-snapdragon-6-gen
 qualcomm unveils a pair of chips: snapdragon 6, 4 series to improve the features you actually use
 https://www.wired.com/story/microsoft-executives-discuss-openai-sam-altman-2018/
 musk vs. altman evidence shows what microsoft executives thought of openai
+https://www.techdirt.com/2026/05/08/with-denuvo-completely-defeated-2k-turns-to-annoying-online-check-in-requirement/
+with denuvo completely defeated, 2k turns to annoying online check in requirement
