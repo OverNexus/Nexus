@@ -103,3 +103,5 @@ https://hackaday.com/2026/05/16/asimov-is-an-open-source-humanoid-robot-for-the-
 asimov is an open source humanoid robot for the rest of us
 https://tech.slashdot.org/story/26/05/18/0613223/iran-now-threatens-fees-for-subsea-internet-cables-in-the-strait-of-hormuz
 iran now threatens fees for subsea internet cables in the strait of hormuz
+https://www.theverge.com/games/933204/lg-1000hz-1080p-ultragear-25g590b
+lg will release the first 1000hz, 1080p gaming monitor this year
