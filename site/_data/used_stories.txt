@@ -227,3 +227,5 @@ https://www.androidcentral.com/accessories/power-charging/these-4-features-will-
 don't need a 300w charging station? these 4 features will change your mind
 https://www.armaangomes.com/blogs/doom/
 running doom on our custom cpu and going viral
+https://hackaday.com/2026/07/22/60-fps-nes-emulator-on-esp32/
+60 fps nes emulator on esp32
