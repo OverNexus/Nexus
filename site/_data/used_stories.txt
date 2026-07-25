@@ -231,3 +231,5 @@ https://hackaday.com/2026/07/22/60-fps-nes-emulator-on-esp32/
 60 fps nes emulator on esp32
 https://hackaday.com/2026/07/22/industrial-gpu-adapted-for-the-desktop/
 industrial gpu adapted for the desktop
+https://www.cnet.com/news/privacy/this-searchable-tool-is-helping-track-flock-surveillance-cameras-in-your-city/
+this searchable tool is helping track flock surveillance cameras in your city
