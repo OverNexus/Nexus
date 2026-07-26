@@ -233,3 +233,5 @@ https://hackaday.com/2026/07/22/industrial-gpu-adapted-for-the-desktop/
 industrial gpu adapted for the desktop
 https://www.cnet.com/news/privacy/this-searchable-tool-is-helping-track-flock-surveillance-cameras-in-your-city/
 this searchable tool is helping track flock surveillance cameras in your city
+https://www.androidauthority.com/ive-used-every-pixel-tensor-chip-where-google-went-wrong-3691195/
+i’ve used every pixel tensor chip. here’s where google went wrong — and what i hope comes next
