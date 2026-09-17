@@ -1,24 +1,47 @@
 """
-Nexus News — Daily Article Generator
-Fetches trending tech/gaming news, writes a full SEO-optimized article via Groq,
-saves it as a Jekyll post. Deduplicates by article URL to prevent same-topic repeats.
+Auto-News Site — Daily Article Generator
+Reads config.yml for all settings. No other file needs to be edited.
 """
 
 import os
 import re
 import datetime
 import requests
+import yaml
 
-# ── Config ────────────────────────────────────────────────────────────────────
-NEWS_API_KEY   = os.getenv("NEWS_API_KEY",  "bb47c7769d264e79b455ddc239c5f4e4")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
-OUTPUT_DIR     = os.path.join("site", "_posts")
-USED_FILE      = os.path.join("site", "_data", "used_stories.txt")
+# ── Load config ───────────────────────────────────────────────────────────────
+def load_config() -> dict:
+    with open("config.yml", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
-CATEGORIES = ["gaming", "virtual reality", "augmented reality", "gaming hardware", "game console"]
+CFG = load_config()
 
-# ── Deduplication (by URL — more reliable than title) ─────────────────────────
+# API keys — env vars take priority (for GitHub Actions secrets), then config.yml
+NEWS_API_KEY   = os.getenv("NEWS_API_KEY")   or CFG.get("news_api_key", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or CFG.get("gemini_api_key", "")
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY") or CFG.get("pexels_api_key", "")
+
+SITE_NAME   = CFG.get("site_name", "My News Site")
+SITE_TOPIC  = CFG.get("site_topic", "technology")
+SKIP_WORDS  = [w.strip() for w in CFG.get("skip_keywords", "").split(",") if w.strip()]
+EXTRA_TOPICS = [t.strip() for t in CFG.get("extra_topics", "").split(",") if t.strip()]
+
+OUTPUT_DIR = os.path.join("site", "_posts")
+USED_FILE  = os.path.join("site", "_data", "used_stories.txt")
+
+# Build category search list from topic
+BASE_CATEGORIES = {
+    "gaming":   ["gaming", "video games", "game console", "esports", "gaming hardware"],
+    "fitness":  ["fitness", "workout", "gym", "health", "nutrition"],
+    "finance":  ["personal finance", "investing", "stock market", "crypto", "economy"],
+    "cooking":  ["cooking", "food", "recipe", "restaurant", "cuisine"],
+    "crypto":   ["cryptocurrency", "bitcoin", "blockchain", "defi", "web3"],
+    "travel":   ["travel", "tourism", "destination", "flights", "hotels"],
+    "tech":     ["technology", "artificial intelligence", "gadgets", "software", "startup"],
+}
+CATEGORIES = BASE_CATEGORIES.get(SITE_TOPIC, [SITE_TOPIC]) + EXTRA_TOPICS
+
+# ── Deduplication ─────────────────────────────────────────────────────────────
 def load_used() -> set:
     if not os.path.exists(USED_FILE):
         return set()
@@ -38,7 +61,7 @@ def fetch_image(query: str) -> str:
         "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?w=1200",
         "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?w=1200",
     ]
-    if not PEXELS_API_KEY:
+    if not PEXELS_API_KEY or PEXELS_API_KEY == "YOUR_PEXELS_KEY_HERE":
         return fallbacks[0]
     try:
         clean = re.sub(r'[^a-z0-9 ]', '', query.lower()).strip()[:60]
@@ -57,10 +80,10 @@ def fetch_image(query: str) -> str:
     return fallbacks[0]
 
 # ── NewsAPI ───────────────────────────────────────────────────────────────────
-def fetch_top_story():
+def fetch_top_story() -> dict:
     used = load_used()
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
-    seen_urls = set()  # dedupe within this run across categories
+    seen_urls: set = set()
 
     for category in CATEGORIES:
         params = {
@@ -73,9 +96,7 @@ def fetch_top_story():
         for a in resp.json().get("articles", []):
             url   = (a.get("url") or "").lower()
             title = (a.get("title") or "").strip()
-            # Skip articles clearly not about gaming/tech
-            skip_keywords = ["lawsuit", "promoted", "career", "stock", "finance", "lawsuit", "election", "politics", "recipe", "sport", "soccer", "football", "basketball"]
-            if any(kw in title.lower() for kw in skip_keywords):
+            if any(kw in title.lower() for kw in SKIP_WORDS):
                 continue
             if (a.get("description")
                     and "[Removed]" not in title
@@ -85,81 +106,79 @@ def fetch_top_story():
                 seen_urls.add(url)
                 print(f"[NewsAPI] Found: {title}")
                 return a
-    raise RuntimeError("No new stories found — all recent stories already published.")
+    raise RuntimeError("No new stories found today.")
 
-# ── Groq article generation ───────────────────────────────────────────────────
+# ── Gemini article generation ─────────────────────────────────────────────────
 def generate_article(story: dict) -> str:
-    today      = datetime.date.today().isoformat()
-    image_url  = fetch_image(story["title"])
-    # Sanitize inputs — strip non-ASCII and truncate to safe lengths
+    today     = datetime.date.today().isoformat()
+    image_url = fetch_image(story["title"])
     title  = story["title"].encode("ascii", "ignore").decode()[:200]
     desc   = (story.get("description") or "").encode("ascii", "ignore").decode()[:400]
     source = (story.get("source", {}).get("name") or "Unknown").encode("ascii", "ignore").decode()[:100]
 
-    prompt = f"""You are a senior tech journalist at Nexus News covering Gaming, AR, VR, and Technology.
-Write a LONG (minimum 900 words), deeply engaging, SEO-optimized article based on this news story.
-Write like a professional at IGN or The Verge — insightful, opinionated, specific, with real depth.
+    prompt = f"""You are a senior journalist at {SITE_NAME}, a professional website covering {SITE_TOPIC}.
+Write a LONG (minimum 900 words), engaging, SEO-optimized article based on this news story.
+Write like a professional at IGN or The Verge — insightful, opinionated, with real depth.
 
 NEWS TITLE: {title}
 NEWS DESCRIPTION: {desc}
 SOURCE: {source}
 
-IMPORTANT SEO RULES:
-- Title must include the main keyword naturally and be under 65 characters
-- Description must be under 155 characters and include the main keyword
-- Use the main keyword in the first paragraph
-- Include related keywords naturally throughout
-- Write for humans first, search engines second
+SEO RULES:
+- Title under 65 characters, include main keyword
+- Description under 155 characters, include main keyword
+- Use keyword in first paragraph
+- Write for humans first
 
-Return ONLY valid Jekyll Markdown with EXACTLY this structure (no extra text before or after):
+Return ONLY valid Jekyll Markdown with EXACTLY this structure:
 
 ---
 layout: post
 title: "COMPELLING SEO TITLE UNDER 65 CHARS"
 date: {today}
-description: "META DESCRIPTION UNDER 155 CHARS WITH MAIN KEYWORD"
-categories: ["Gaming or AR/VR or Tech — pick the most accurate one"]
+description: "META DESCRIPTION UNDER 155 CHARS"
+categories: ["pick most accurate: Gaming OR AR/VR OR Tech"]
 tags: ["tag1", "tag2", "tag3", "tag4", "tag5"]
 image: "{image_url}"
 ---
 
 ## TL;DR
 
-3-4 punchy sentences that hook the reader immediately. Include the main keyword.
+3-4 punchy sentences that hook the reader.
 
 ## What's Happening
 
-3 detailed paragraphs covering the full context, background, and significance. Be specific with names, numbers, and dates.
+3 detailed paragraphs with full context, names, numbers, dates.
 
 ## Deep Dive
 
-2-3 paragraphs of expert technical or industry analysis. Include real comparisons, benchmarks, or market data where relevant.
+2-3 paragraphs of expert analysis with comparisons and data.
 
 ## Key Specs & Facts
 
 | Specification | Detail |
 |---|---|
-| [6+ rows of real, specific specs or facts relevant to this story] | [accurate values] |
+| [6+ rows of real relevant specs] | [values] |
 
 ## Why This Matters to You
 
-2-3 paragraphs on direct real-world impact. Speak directly to gamers and tech enthusiasts. Be specific about what changes for them.
+2-3 paragraphs on real-world impact for the reader.
 
 ## The Bigger Picture
 
-2 paragraphs on what this signals for the industry, upcoming trends, and where things are heading in the next 12-24 months.
+2 paragraphs on industry trends and the next 12-24 months.
 
 ## How It Stacks Up Against the Competition
 
-1-2 paragraphs comparing to direct rivals or alternatives. Name names.
+1-2 paragraphs naming direct rivals.
 
 ## Our Take
 
-> 3-4 sentence sharp editorial opinion. Take a clear stance. Don't sit on the fence.
+> 3-4 sentence sharp editorial opinion. Take a clear stance.
 
 ## Final Verdict
 
-2 strong paragraphs of conclusion with a forward-looking prediction. End with a memorable line.
+2 strong paragraphs with a forward-looking prediction.
 """
 
     headers = {"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
@@ -168,17 +187,16 @@ image: "{image_url}"
         "generationConfig": {"temperature": 0.72, "maxOutputTokens": 3000}
     }
     resp = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         json=payload, headers=headers, timeout=90
     )
     if not resp.ok:
         print(f"[Gemini Error] {resp.status_code}: {resp.text[:300]}")
     resp.raise_for_status()
     text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-    # Strip any markdown code fences the model might add
     text = re.sub(r'^```(?:markdown|md)?\n?', '', text, flags=re.MULTILINE)
     text = re.sub(r'\n?```$', '', text, flags=re.MULTILINE)
-    print("[Nexus] Groq responded successfully.")
+    print(f"[{SITE_NAME}] Article generated successfully.")
     return text.strip()
 
 # ── Save Jekyll post ──────────────────────────────────────────────────────────
@@ -190,12 +208,12 @@ def save_article(content: str, story: dict):
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
     mark_used(story.get("url", ""), story["title"])
-    print(f"[Nexus] Saved: {filepath}")
+    print(f"[{SITE_NAME}] Saved: {filepath}")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print("[Nexus News] Starting daily generation...")
+    print(f"[{SITE_NAME}] Starting daily generation...")
     story   = fetch_top_story()
     article = generate_article(story)
     save_article(article, story)
-    print("[Nexus News] Done.")
+    print(f"[{SITE_NAME}] Done.")

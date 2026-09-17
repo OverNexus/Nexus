@@ -1,0 +1,39 @@
+# ============================================================
+#  AUTO-NEWS SITE — SETUP FILE
+#  Fill in the values below, then follow the README steps.
+#  This is the ONLY file you need to edit.
+# ============================================================
+
+# ── YOUR SITE ────────────────────────────────────────────────
+site_name: "Nexus News"
+site_description: "Daily Gaming, AR, VR & Tech News — AI-powered journalism"
+site_author: "Nexus News Editorial"
+
+# Your GitHub username and repo name
+github_username: "OverNexus"
+repo_name: "Nexus"
+
+# The niche/topic your site covers (this controls what news gets fetched)
+# Examples: "gaming", "fitness", "finance", "cooking", "crypto", "travel"
+site_topic: "gaming"
+
+# ── YOUR API KEYS ────────────────────────────────────────────
+# Get free keys from the links below:
+# NewsAPI    → https://newsapi.org/register
+# Gemini     → https://aistudio.google.com/apikey
+# Pexels     → https://www.pexels.com/api/
+
+news_api_key: "bb47c7769d264e79b455ddc239c5f4e4"
+gemini_api_key: "YOUR_GEMINI_KEY_HERE"
+pexels_api_key: "YOUR_PEXELS_KEY_HERE"
+
+# ── PUBLISHING SCHEDULE ──────────────────────────────────────
+# What time to publish daily (UTC, 24h format)
+publish_hour: 9
+
+# ── ADVANCED (optional, leave as-is if unsure) ───────────────
+# Extra topics to search for news (comma separated)
+extra_topics: ""
+
+# Words in article titles to skip (comma separated)
+skip_keywords: "lawsuit,career,stock,finance,election,politics,recipe,soccer,football,basketball"
