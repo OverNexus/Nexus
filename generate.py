@@ -57,9 +57,9 @@ def mark_used(url: str, title: str):
 # ── Pexels image ──────────────────────────────────────────────────────────────
 def fetch_image(query: str) -> str:
     fallbacks = [
-        "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200",
-        "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?w=1200",
-        "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?w=1200",
+        "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg",
+        "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg",
+        "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
     ]
     if not PEXELS_API_KEY or PEXELS_API_KEY == "YOUR_PEXELS_KEY_HERE":
         return fallbacks[0]
@@ -74,7 +74,9 @@ def fetch_image(query: str) -> str:
         resp.raise_for_status()
         photos = resp.json().get("photos", [])
         if photos:
-            return photos[0]["src"]["large2x"]
+            # Strip query params to avoid YAML front matter issues
+            url = photos[0]["src"]["large2x"].split("?")[0]
+            return url
     except Exception as e:
         print(f"[Pexels] {e}")
     return fallbacks[0]
@@ -184,10 +186,10 @@ image: "{image_url}"
     headers = {"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.72, "maxOutputTokens": 3000}
+        "generationConfig": {"temperature": 0.72, "maxOutputTokens": 8192}
     }
     resp = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
         json=payload, headers=headers, timeout=90
     )
     if not resp.ok:
