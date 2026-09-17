@@ -16,7 +16,7 @@ PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 OUTPUT_DIR     = os.path.join("site", "_posts")
 USED_FILE      = os.path.join("site", "_data", "used_stories.txt")
 
-CATEGORIES = ["gaming", "virtual reality", "augmented reality", "tech hardware", "AI gaming"]
+CATEGORIES = ["gaming", "virtual reality", "augmented reality", "gaming hardware", "game console"]
 
 # ── Deduplication (by URL — more reliable than title) ─────────────────────────
 def load_used() -> set:
@@ -73,6 +73,10 @@ def fetch_top_story():
         for a in resp.json().get("articles", []):
             url   = (a.get("url") or "").lower()
             title = (a.get("title") or "").strip()
+            # Skip articles clearly not about gaming/tech
+            skip_keywords = ["lawsuit", "promoted", "career", "stock", "finance", "lawsuit", "election", "politics", "recipe", "sport", "soccer", "football", "basketball"]
+            if any(kw in title.lower() for kw in skip_keywords):
+                continue
             if (a.get("description")
                     and "[Removed]" not in title
                     and url not in seen_urls
@@ -114,7 +118,7 @@ layout: post
 title: "COMPELLING SEO TITLE UNDER 65 CHARS"
 date: {today}
 description: "META DESCRIPTION UNDER 155 CHARS WITH MAIN KEYWORD"
-categories: ["Gaming"]
+categories: ["Gaming or AR/VR or Tech — pick the most accurate one"]
 tags: ["tag1", "tag2", "tag3", "tag4", "tag5"]
 image: "{image_url}"
 ---

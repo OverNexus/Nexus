@@ -39,7 +39,7 @@
   <div class="ticker-wrap" aria-label="Latest news ticker">
     <span class="ticker-label">LATEST</span>
     <div class="ticker-track">
-      <span class="ticker-content" id="ticker">Gaming · AR · VR · Technology · AI · Hardware · Esports · Spatial Computing</span>
+      <span class="ticker-content" id="ticker">{% for post in site.posts limit:8 %}{{ post.title }} &nbsp;·&nbsp; {% endfor %}</span>
     </div>
   </div>
 </header>

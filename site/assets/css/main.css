@@ -239,3 +239,7 @@ img { max-width: 100%; height: auto; display: block; }
 ::-webkit-scrollbar-thumb { background: var(--border-h); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
 ::selection { background: var(--purple-dim); color: var(--purple); }
+
+/* ── CATEGORY / LIST PAGE ── */
+.list-page { padding: 5rem 0 4rem; }
+.list-page .section-header { margin-bottom: 2rem; }
