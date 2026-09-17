@@ -168,7 +168,7 @@ image: "{image_url}"
         "generationConfig": {"temperature": 0.72, "maxOutputTokens": 3000}
     }
     resp = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
         json=payload, headers=headers, timeout=90
     )
     if not resp.ok:
