@@ -243,3 +243,9 @@ img { max-width: 100%; height: auto; display: block; }
 /* ── CATEGORY / LIST PAGE ── */
 .list-page { padding: 5rem 0 4rem; }
 .list-page .section-header { margin-bottom: 2rem; }
+
+/* ── OVERFLOW FIXES ── */
+.post-body { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; }
+.post-body table { display: block; overflow-x: auto; white-space: nowrap; max-width: 100%; }
+.post-body pre { white-space: pre-wrap; word-wrap: break-word; }
+.post-layout { overflow-x: hidden; }
