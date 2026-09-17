@@ -11,7 +11,7 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 NEWS_API_KEY   = os.getenv("NEWS_API_KEY",  "bb47c7769d264e79b455ddc239c5f4e4")
-GROQ_API_KEY   = os.getenv("GROQ_API_KEY",  "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 OUTPUT_DIR     = os.path.join("site", "_posts")
 USED_FILE      = os.path.join("site", "_data", "used_stories.txt")
@@ -162,19 +162,19 @@ image: "{image_url}"
 2 strong paragraphs of conclusion with a forward-looking prediction. End with a memorable line.
 """
 
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+    headers = {"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
     payload = {
-        "model": "llama3-70b-8192",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.72,
-        "max_tokens": 3000,
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.72, "maxOutputTokens": 3000}
     }
-    resp = requests.post("https://api.groq.com/openai/v1/chat/completions",
-                         json=payload, headers=headers, timeout=90)
+    resp = requests.post(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        json=payload, headers=headers, timeout=90
+    )
     if not resp.ok:
-        print(f"[Groq Error] {resp.status_code}: {resp.text[:300]}")
+        print(f"[Gemini Error] {resp.status_code}: {resp.text[:300]}")
     resp.raise_for_status()
-    text = resp.json()["choices"][0]["message"]["content"].strip()
+    text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
     # Strip any markdown code fences the model might add
     text = re.sub(r'^```(?:markdown|md)?\n?', '', text, flags=re.MULTILINE)
     text = re.sub(r'\n?```$', '', text, flags=re.MULTILINE)
