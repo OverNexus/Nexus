@@ -193,7 +193,7 @@ image: "{image_url}"
     for attempt in range(1, 4):
         try:
             resp = requests.post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
                 json=payload, headers=headers, timeout=180
             )
             if not resp.ok:
