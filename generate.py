@@ -5,6 +5,7 @@ Reads config.yml for all settings. No other file needs to be edited.
 
 import os
 import re
+import time
 import datetime
 import requests
 import yaml
@@ -188,13 +189,24 @@ image: "{image_url}"
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.72, "maxOutputTokens": 8192}
     }
-    resp = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
-        json=payload, headers=headers, timeout=90
-    )
-    if not resp.ok:
-        print(f"[Gemini Error] {resp.status_code}: {resp.text[:300]}")
-    resp.raise_for_status()
+    last_err = None
+    for attempt in range(1, 4):
+        try:
+            resp = requests.post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                json=payload, headers=headers, timeout=180
+            )
+            if not resp.ok:
+                print(f"[Gemini Error] {resp.status_code}: {resp.text[:300]}")
+            resp.raise_for_status()
+            break
+        except (requests.exceptions.Timeout, requests.exceptions.HTTPError) as e:
+            last_err = e
+            wait = 15 * attempt
+            print(f"[Gemini] Attempt {attempt} failed ({type(e).__name__}), retrying in {wait}s...")
+            time.sleep(wait)
+    else:
+        raise last_err
     text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
     text = re.sub(r'^```(?:markdown|md)?\n?', '', text, flags=re.MULTILINE)
     text = re.sub(r'\n?```$', '', text, flags=re.MULTILINE)
