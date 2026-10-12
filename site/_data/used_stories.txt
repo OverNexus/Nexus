@@ -293,3 +293,5 @@ https://www.theverge.com/entertainment/1008441/playdate-season-3
 the humble playdate has become one of gaming’s best deals
 https://hackaday.com/2026/10/10/the-weirdest-video-games-were-hacks/
 the weirdest video games were hacks
+https://www.theverge.com/ai-artificial-intelligence/1008484/learning-local-ai-hermes-qwen-model-mac-studio-testing-diary-progress
+learning to use local ai is exciting, overwhelming, and frustrating
